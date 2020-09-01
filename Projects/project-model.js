@@ -8,7 +8,7 @@ module.exports = {
 
 //function for router.get. return projects from database then map through and return whether completed or not
 function getProjects() {
-  return db("projects").then((projects) =>
+  return db("Projects").then((projects) =>
     projects.map((project) => {
       return { ...project, completed: !!project.completed };
     })

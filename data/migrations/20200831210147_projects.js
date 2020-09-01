@@ -2,7 +2,7 @@
 exports.up = function(knex) {
   
   //create projects table with columns for  requirements id, project_name, description and completed or not
-  await knex.schema.createTable('projects', tbl =>{
+  await knex.schema.createTable('Projects', tbl =>{
     tbl.increments();
     tbl.string('project_name', 255).notNullable();
     tbl.string('description');
@@ -13,7 +13,7 @@ exports.up = function(knex) {
 })
 
 //create a tasks for projects  table with cloumns for ids with cascading on update and delete, description of task , task_name , any additional_notes and noolean completed or not.
-.createTable('tasks', tbl => {
+.createTable('Tasks', tbl => {
     tbl.increments();
     tbl.integer('project_id')
     .unsigned()
@@ -29,7 +29,7 @@ exports.up = function(knex) {
 })
 
 //create resources table for resources to complete tasks in projects with colum for id, name od rresource and a description of the resource
-.createTable('resources', tbl => {
+.createTable('Resources', tbl => {
     tbl.increments();
     tbl.string('name', 255).notNullable().unique();
     tbl.string('description');
