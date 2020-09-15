@@ -16,7 +16,7 @@ exports.up = async function (knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("projects")
+      .inTable("project")
       .onUpdate("CASCADE");
   });
 
@@ -32,7 +32,7 @@ exports.up = async function (knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("projects")
+      .inTable("project")
       .onUpdate("CASCADE");
     table
       .integer("resources_id")
