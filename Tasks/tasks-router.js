@@ -1,50 +1,25 @@
 const express = require("express");
-
-const db = require("./tasks-model");
-
+const Schemes = require("../data/db-scheme.js");
 const router = express.Router();
 
-//router.get to get tasks from db
 router.get("/", (req, res) => {
-  db.getTasks()
-    .then((task) => {
-      res.json(task);
+  Schemes.findTasks()
+    .then((tasks) => {
+      res.status(200).json({ tasks });
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Failed to get task" });
+    .catch((error) => {
+      res.status(500).json({ error: "Could not display list of tasks" });
     });
 });
 
-//router.post to add tasks to db of resources nd projects
 router.post("/", (req, res) => {
-  const data = req.body;
-
-  db.addTasks(data)
+  Schemes.addTask(req.body)
     .then((newTask) => {
-      res.status(201).json(newTask);
+      res.status(200).json({ newTask });
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ message: "Failed to create new task" });
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Could not create new task" });
     });
 });
-
-//router.delete to remove tasks from resources using id
-router.delete("/:id", (req, res) => {
-  const { id } = req.params;
-
-  db.removeTasks(id)
-    .then((deleted) => {
-      if (deleted) {
-        res.json({ removed: deleted });
-      } else {
-        res.status(404).json({ message: "Could not find task with given id" });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ message: "Failed to delete task" });
-    });
-});
-
 module.exports = router;

@@ -1,66 +1,53 @@
-exports.up = function (knex) {
-  //create projects table with columns for  requirements id, project_name, description and completed or not
-  return (
-    knex.schema
-      .createTable("projectTable", (tbl) => {
-        tbl.increments();
-        tbl.string("project_name", 255).notNullable();
-        tbl.string("description");
-        tbl.boolean("completed").notNullable().defaultTo(false);
-      })
+exports.up = async function (knex) {
+  await knex.schema.createTable("project", (table) => {
+    table.increments("id");
+    table.text("name").notNullable().unique();
+    table.text("description");
+    table.boolean("completed").notNullable().default(false);
+  });
 
-      //create a tasks for projects  table with cloumns for ids with cascading on update and delete, description of task , task_name , any additional_notes and noolean completed or not.
-      .createTable("Tasks", (tbl) => {
-        tbl.increments();
-        tbl
-          .integer("project_id")
-          .unsigned()
-          .notNullable()
-          .references("id")
-          .inTable("projects")
-          .onUpdate("CASCADE")
-          .onDelete("CASCADE");
-        tbl.string("description").notNullable();
-        tbl.string("task_name", 255).notNullable();
-        tbl.string("additional_notes", 255);
-        tbl.boolean("completed").notNullable().defaultTo(false);
-      })
+  await knex.schema.createTable("tasks", (table) => {
+    table.increments("id");
+    table.text("description").notNullable();
+    table.text("notes");
+    table.boolean("completed").notNullable().default(false);
+    table
+      .integer("projects_id")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("project")
+      .onUpdate("CASCADE");
+  });
 
-      //create resources table for resources to complete tasks in projects with colum for id, name od rresource and a description of the resource
-      .createTable("Resources", (tbl) => {
-        tbl.increments();
-        tbl.string("name", 255).notNullable().unique();
-        tbl.string("description");
-      })
+  await knex.schema.createTable("resources", (table) => {
+    table.increments("id");
+    table.text("name").notNullable().unique();
+    table.text("description");
+  });
 
-      //create a table with resources of the projects.  columns for projectId, projects table information and cascading on uodate and delete.   also include resource id name of resources form resource table and cascading effect again
-      .createTable("project_resources", (tbl) => {
-        tbl.increments();
-        tbl
-          .integer("project_id")
-          .unsigned()
-          .notNullable()
-          .references("id")
-          .inTable("projects")
-          .onUpdate("CASCADE")
-          .onDelete("CASCADE");
-        tbl
-          .integer("resource_id")
-          .unsigned()
-          .notNullable()
-          .references("id")
-          .inTable("resources")
-          .onUpdate("CASCADE")
-          .onDelete("CASCADE");
-      })
-  );
+  await knex.schema.createTable("projects_resources", (table) => {
+    table
+      .integer("projects_id")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("project")
+      .onUpdate("CASCADE");
+    table
+      .integer("resources_id")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("resources")
+      .onUpdate("CASCADE");
+    table.primary(["projects_id", "resources_id"]);
+  });
 };
 
-//down function to drop created tables if a table is found to xist.
-exports.down = function (knex) {
-  return knex.schema
-    .dropTableIfExists("project_resources")
-    .dropTableIfExists("tasks")
-    .dropTableIfExists("resources")
-    .dropTableIfExists("projects");
+exports.down = async function (knex) {
+  await knex.schema.dropTableIfExists("projects_resources");
+  await knex.schema.dropTableIfExists("resources");
+  await knex.schema.dropTableIfExists("tasks");
+  await knex.schema.dropTableIfExists("project");
 };
